@@ -8,7 +8,7 @@
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)
 ![Deploy](https://img.shields.io/badge/deploy-GitHub%20Pages-222?logo=github)
 
 <img src="docs/typing.png" alt="typeheat mid-test: the background glows amber at full speed" width="780">
@@ -143,14 +143,6 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 - Personal bests are stored in your browser's `localStorage`, so they are per device and cleared with site data.
 - Fonts (Manrope and JetBrains Mono) load from Google Fonts. Offline, the app falls back to system fonts.
 
-## Contributing
-
-Issues and pull requests are welcome. For anything bigger than a small fix, please open an issue first so we can agree on the approach.
-
-```bash
-git checkout -b my-change
-npm run build   # make sure it still builds
-```
 ## Feedback
 
 Bug reports and feature ideas are welcome as GitHub issues. Code contributions are not accepted, since the project is closed-source.
