@@ -34,12 +34,12 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 | **Text options** | Punctuation and numbers toggles on a 500-word English list |
 | **Backspace** | *Fast erase* (Backspace deletes a word) or *classic* (Backspace deletes a letter, `Ctrl/Alt+Backspace` deletes a word) |
 | **Heat effect** | Glow, caret and live "% hot" readout driven by your last ~2 seconds of typing |
-| **Endless text** | Words keep scrolling in, so you can never run out before the timer does |
+| **Endless text** | In time mode, words keep scrolling in, so you never run out before the timer does |
 | **Results** | WPM, raw WPM, accuracy, consistency, correct/wrong characters, speed-per-second chart |
 | **Missed-key heatmap** | A keyboard that lights up the keys you get wrong most |
 | **Personal bests** | Saved per mode and setting in your browser |
 | **Themes** | night, paper, violet |
-| **Accessibility** | Respects `prefers-reduced-motion`; keyboard-only by design |
+| **Accessibility** | Caret and button transitions turn off under `prefers-reduced-motion`; keyboard-only by design |
 
 <div align="center">
 <img src="docs/results.png" alt="Results screen with WPM, accuracy, speed chart and missed-key heatmap" width="780">
@@ -90,7 +90,7 @@ Each keystroke is logged with a timestamp. The heat target is your correct-keyst
 
 - The heat animation runs in a single `requestAnimationFrame` loop that writes straight to the DOM (CSS variables and inline styles). It never touches React state, so it causes no re-renders at 60 fps.
 - Typed text and the current word index live in one state object, updated atomically on each keystroke. Keeping them separate caused a crash when keys arrived faster than React could sync them.
-- Only a window of words around the cursor is rendered, so the DOM stays small however long the test runs.
+- Each word is a memoized component, so a keystroke re-renders only the word you are typing, and new words are generated 60 at a time when fewer than 40 remain.
 - The caret position is read from layout offsets, not from bounding rectangles mid-transition, so it never lags behind the text.
 
 ## Project structure
@@ -104,7 +104,8 @@ typeheat/
 │   └── main.jsx                   # React entry point
 ├── index.html
 ├── vite.config.js
-└── package.json
+├── package.json
+└── LICENSE
 ```
 
 The app is a single component today. Splitting the typing engine from the UI is on the roadmap.
