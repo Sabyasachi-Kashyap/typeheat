@@ -1,4 +1,5 @@
 import React,{useState,useRef,useEffect,useCallback,useMemo} from "react";
+import {loadCfg,saveCfg,loadHist,saveHist,clearHist,THEMES,SecondChart,ProgressPanel,ComparePanel,HistoryView,DataTable,settingLabel} from "./progress.jsx";
 
 const WB=[...new Set(`the of and a to in is you that it he was for on are as with his they i at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who its now find long down day did get come made may part person year thing man world life hand child woman place work week case point government company group problem fact room mother area money story month lot right study book job business issue side kind head house service friend father power hour game line end member law car city community name team minute idea body information back parent face level office door health art war history party result change morning reason research girl moment air teacher force education light travel garden music ocean forest bridge paper market system program question school student country state fire earth food sea sun moon star sky tree flower animal bird fish mountain river lake island desert field village town street road building window wall floor kitchen phone computer screen keyboard mouse camera table chair desk clock letter language voice sound color shape size weight distance speed weather season spring summer winter evening night dream memory plan goal future past truth hope fear peace freedom justice beauty wisdom courage patience begin become believe bring build carry catch choose clean close cook dance decide deliver design discover draw drive earn enjoy explain explore fall feel fight fix fly follow forget gather grow happen help hold imagine improve increase invite join keep know lead learn leave listen live lose love manage mean meet move need notice offer open order own pass pay perform play prepare press produce promise protect prove provide pull push raise reach read receive record reduce remember remove repeat replace reply report require return run save say search seem sell send serve share show sign sing sit sleep smile solve speak spend stand start stay stop suggest support take talk teach tell think throw touch trust try turn understand visit wait walk want watch wear win wish wonder worry quick brown fox jump lazy dog bright cloud silent gentle rapid distant narrow wide steady fragile simple complex difficult easy important strange normal possible true clear empty full heavy soft hot cold warm cool fast slow early late near far high low big small large tiny strong weak young old new fresh modern ancient common rare public private local global natural real perfect broken safe dangerous happy sad calm brave proud honest careful curious serious funny tired healthy internet network software hardware password account message email browser download update device battery signal wireless digital online server database code function variable interface algorithm engine platform application website backup security`.split(" "))];
 
@@ -15,7 +16,7 @@ function gen(n,o){const out=[];let last="";for(let i=0;i<n;i++){let w;
   if(o.punct&&!/^\d/.test(w)){if(Math.random()<.15)w=w[0].toUpperCase()+w.slice(1);const r=Math.random();if(r<.1)w+=",";else if(r<.16)w+=".";else if(r<.18)w+="?";}
   out.push(w);}return out;}
 const mix=(a,b,h)=>a.map((c,i)=>Math.round(c+(b[i]-c)*h));
-const DEF={mode:"time",amount:30,punct:false,nums:false,bs:"fast",theme:"night"};
+const INIT=loadCfg();
 
 const Word=React.memo(function Word({w,t,cur,wi,refs}){
   return <span ref={el=>(refs.current[wi]=el)} style={{whiteSpace:"nowrap"}}>
@@ -25,9 +26,9 @@ const Word=React.memo(function Word({w,t,cur,wi,refs}){
 });
 
 export default function TypingTest(){
-  const [cfg,setCfg]=useState(DEF);
-  const cfgRef=useRef(DEF);
-  const WR=useRef(null); if(!WR.current)WR.current=gen(120,DEF);
+  const [cfg,setCfg]=useState(INIT);
+  const cfgRef=useRef(INIT);
+  const WR=useRef(null); if(!WR.current)WR.current=gen(INIT.mode==="words"?INIT.amount:120,INIT);
   const [words,setWords]=useState(WR.current);
   const S=useRef({typed:[""],index:0});
   const [session,setSession]=useState(S.current);
@@ -35,6 +36,13 @@ export default function TypingTest(){
   const ph=useRef("idle");
   const [elapsed,setElapsed]=useState(0);
   const [result,setResult]=useState(null);
+  const [history,setHistory]=useState(loadHist);
+  const [tab,setTab]=useState("test");
+  const [showTable,setShowTable]=useState(false);
+  const [scope,setScope]=useState("setting");
+  const [view,setViewS]=useState("test");
+  const viewRef=useRef("test");
+  const setView=v=>{viewRef.current=v;setViewS(v);};
   const t0=useRef(0),log=useRef([]),ke=useRef({}),cnt=useRef({ok:0,bad:0});
   const hT=useRef(0),hD=useRef(0),lastKey=useRef(0);
   const rootRef=useRef(),wrapRef=useRef(),boxRef=useRef(),caretRef=useRef(),glowRef=useRef(),hotRef=useRef(),wref=useRef([]);
@@ -42,11 +50,11 @@ export default function TypingTest(){
   const {typed,index}=session;
 
   const reset=useCallback((nc)=>{
-    if(nc){cfgRef.current=nc;setCfg(nc);}
+    if(nc){cfgRef.current=nc;setCfg(nc);saveCfg(nc);}
     const c=cfgRef.current;
     WR.current=gen(c.mode==="words"?c.amount:120,c);setWords(WR.current);
     S.current={typed:[""],index:0};setSession(S.current);
-    ph.current="idle";setPh("idle");setElapsed(0);setResult(null);
+    ph.current="idle";setPh("idle");setElapsed(0);setResult(null);setTab("test");setShowTable(false);
     log.current=[];ke.current={};cnt.current={ok:0,bad:0};hT.current=0;
   },[]);
 
@@ -65,7 +73,10 @@ export default function TypingTest(){
     let pb=0,isPB=false;
     try{pb=+localStorage.getItem(key)||0;if(wpm>pb){localStorage.setItem(key,wpm);isPB=pb>0;}}catch(e){}
     const {ok,bad}=cnt.current;
-    setResult({wpm,raw:Math.round(all/5/(el/60)),acc:Math.round(100*ok/Math.max(1,ok+bad)),cons:Math.max(0,Math.round(100-100*sd/mean)),ok,bad,series,errs,isPB,pb:Math.max(pb,wpm),keys:{...ke.current},el:Math.round(el)});
+    const rawW=Math.round(all/5/(el/60)),accP=Math.round(100*ok/Math.max(1,ok+bad)),consP=Math.max(0,Math.round(100-100*sd/mean));
+    const rec={t:Date.now(),wpm,raw:rawW,acc:accP,cons:consP,mode:c.mode,amount:c.amount,punct:c.punct,nums:c.nums,el:Math.round(el)};
+    setHistory(h=>{const nh=[...h,rec].slice(-300);saveHist(nh);return nh;});
+    setResult({wpm,raw:rawW,acc:accP,cons:consP,ok,bad,series,errs,isPB,pb:Math.max(pb,wpm),keys:{...ke.current},el:Math.round(el),rec});
     setPh("done");
   },[]);
 
@@ -77,11 +88,18 @@ export default function TypingTest(){
 
   const onKey=useCallback(e=>{
     const k=e.key,c=cfgRef.current;
-    if(k==="Tab"||k==="Escape"){e.preventDefault();reset();return;}
-    if(ph.current==="done")return;
+    if(k==="Tab"||k==="Escape"){e.preventDefault();setView("test");reset();return;}
+    if(viewRef.current==="history")return;
+    if(ph.current==="done"){
+      if(k==="1")setTab("test");else if(k==="2")setTab("progress");else if(k==="3")setTab("compare");
+      else if(k==="t"||k==="T")setShowTable(v=>!v);
+      return;
+    }
     const typed=S.current.typed.slice();let idx=S.current.index;
     if(k==="Backspace"){
-      e.preventDefault();const wd=c.bs==="fast"||e.ctrlKey||e.altKey;
+      e.preventDefault();
+      // word mode: Backspace = word, Shift+Backspace = one letter. letter mode: Backspace = letter, Ctrl/Alt+Backspace = word.
+      const wd=c.bs==="word"?!e.shiftKey:(e.ctrlKey||e.altKey);
       if(typed[idx].length)typed[idx]=wd?"":typed[idx].slice(0,-1);
       else if(idx>0){idx--;typed.pop();if(wd)typed[idx]="";}
     }else if(k===" "){
@@ -144,13 +162,11 @@ export default function TypingTest(){
   const kb=["qwertyuiop","asdfghjkl","zxcvbnm"];
   const maxErr=result?Math.max(1,...Object.values(result.keys)):1;
   const top=result?Object.entries(result.keys).sort((a,b)=>b[1]-a[1]).slice(0,6):[];
-  const chart=useMemo(()=>{
-    if(!result)return null;const s=result.series,mx=Math.max(20,...s),W=640,H=150,n=Math.max(1,s.length-1);
-    const pts=s.map((v,i)=>[s.length===1?W/2:i/n*W,H-6-(v/mx)*(H-20)]);
-    return {mx,line:pts.map(p=>p.join(",")).join(" "),area:`0,${H} ${pts.map(p=>p.join(",")).join(" ")} ${W},${H}`,pts,W,H};
-  },[result]);
 
-  const vars={"--bg":th.bg,"--panel":th.panel,"--fg":th.fg,"--dim":th.dim,"--mid":th.mid,"--err":th.err,"--hc":`rgb(${th.cool})`};
+  const dark=cfg.theme!=="paper";
+  // chart colours: three categorical slots, validated for contrast and colour-blind separation on every theme surface
+  const pal=dark?["#3987e5","#d95926","#199e70"]:["#2a78d6","#eb6834","#1baf7a"];
+  const vars={"--grid":dark?"rgba(255,255,255,.09)":"rgba(0,0,0,.12)","--s1":pal[0],"--s2":pal[1],"--s3":pal[2],"--bg":th.bg,"--panel":th.panel,"--fg":th.fg,"--dim":th.dim,"--mid":th.mid,"--err":th.err,"--hc":`rgb(${th.cool})`};
   return <div ref={rootRef} style={{...vars,background:"var(--bg)",color:"var(--fg)",minHeight:"100vh",position:"relative",overflow:"hidden",fontFamily:"'Manrope',system-ui,sans-serif",padding:"36px 20px",display:"flex",justifyContent:"center",WebkitFontSmoothing:"antialiased"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
       *{box-sizing:border-box}.mono{font-family:'JetBrains Mono',monospace}
@@ -160,6 +176,8 @@ export default function TypingTest(){
       .sep{width:1px;height:16px;background:var(--dim);opacity:.4;margin:0 6px}
       .caret{position:absolute;left:0;top:0;width:2px;border-radius:2px;background:var(--hc);transition:transform .08s cubic-bezier(.2,.8,.2,1);pointer-events:none;will-change:transform}
       .card{background:var(--panel);border-radius:12px;padding:14px 18px}
+      .lbl{color:var(--dim);font-size:12.5px;padding:0 8px 0 6px}
+      .tip{position:absolute;pointer-events:none;z-index:5;background:var(--bg);border:1px solid var(--dim);border-radius:8px;padding:7px 10px;white-space:nowrap;font-size:12.5px;line-height:1.5}
       @media (prefers-reduced-motion:reduce){.caret,.b{transition:none}}`}</style>
     <div ref={glowRef} style={{position:"fixed",inset:0,pointerEvents:"none"}}/>
     <div style={{width:"100%",maxWidth:820,position:"relative"}}>
@@ -175,13 +193,15 @@ export default function TypingTest(){
       </div>
       <div style={{display:"flex",justifyContent:"center",marginBottom:36}}>
         <div className="bar" style={{opacity:running?0:1,pointerEvents:running?"none":"auto"}}>
-          <Btn on={cfg.bs==="fast"} onClick={()=>set({bs:"fast"})} title="Backspace deletes the whole word">fast erase</Btn>
-          <Btn on={cfg.bs==="classic"} onClick={()=>set({bs:"classic"})} title="Backspace = letter, Ctrl/Alt+Backspace = word">classic</Btn><span className="sep"/>
-          {Object.keys(TH).map(t=><Btn key={t} on={cfg.theme===t} onClick={()=>{cfgRef.current={...cfgRef.current,theme:t};setCfg(cfgRef.current);}}>{t}</Btn>)}
+          <span className="lbl">backspace</span>
+          <Btn on={cfg.bs==="word"} aria-pressed={cfg.bs==="word"} onClick={()=>set({bs:"word"})} title="Backspace deletes the whole word. Shift+Backspace deletes a single letter.">word</Btn>
+          <Btn on={cfg.bs==="letter"} aria-pressed={cfg.bs==="letter"} onClick={()=>set({bs:"letter"})} title="Backspace deletes a single letter. Ctrl or Alt+Backspace deletes a word.">single letter</Btn><span className="sep"/>
+          {THEMES.map(t=><Btn key={t} on={cfg.theme===t} onClick={()=>{cfgRef.current={...cfgRef.current,theme:t};setCfg(cfgRef.current);saveCfg(cfgRef.current);}}>{t}</Btn>)}<span className="sep"/>
+          <Btn on={view==="history"} aria-pressed={view==="history"} onClick={()=>setView(view==="history"?"test":"history")}>history</Btn>
         </div>
       </div>
 
-      {phase!=="done"?<>
+      {view==="history"?<HistoryView history={history} cfg={cfg} scope={scope} setScope={setScope} showTable={showTable} setShowTable={setShowTable} onClear={()=>{clearHist();setHistory([]);}} onBack={()=>{setView("test");reset();}}/>:phase!=="done"?<>
         <div className="mono" style={{display:"flex",gap:22,fontSize:15,marginBottom:14,color:"var(--mid)",opacity:running?1:.5,transition:"opacity .25s"}}>
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
@@ -192,7 +212,7 @@ export default function TypingTest(){
           <div ref={caretRef} className="caret"/>
         </div>
         <div style={{marginTop:30,fontSize:12.5,color:"var(--dim)",opacity:running?0:1,transition:"opacity .25s"}}>
-          start typing · <b>tab</b> restart · {cfg.bs==="fast"?"backspace deletes a word":"ctrl+backspace deletes a word"}
+          start typing · <b>tab</b> restart · {cfg.bs==="word"?"backspace deletes a word, shift+backspace deletes a single letter":"backspace deletes a single letter, ctrl+backspace a word"}
         </div>
       </>:result&&<div>
         <div style={{display:"flex",gap:18,flexWrap:"wrap",alignItems:"stretch"}}>
@@ -205,13 +225,20 @@ export default function TypingTest(){
             <div key={l} className="card" style={{minWidth:105}}><div style={{fontSize:12,color:"var(--mid)"}}>{l}</div><div className="mono" style={{fontSize:30,fontWeight:600,marginTop:6}}>{v}</div></div>)}
         </div>
         <div className="card" style={{marginTop:18}}>
-          <div style={{fontSize:12,color:"var(--mid)",marginBottom:8}}>speed per second (wpm) · red dots = mistakes</div>
-          <svg viewBox={`0 0 ${chart.W} ${chart.H}`} style={{width:"100%",height:"auto",display:"block"}}>
-            <polygon points={chart.area} fill="var(--hc)" opacity=".12"/>
-            <polyline points={chart.line} fill="none" stroke="var(--hc)" strokeWidth="2.5" strokeLinejoin="round"/>
-            {chart.pts.map((p,i)=>result.errs[i]>0&&<circle key={i} cx={p[0]} cy={p[1]} r={3+Math.min(3,result.errs[i])} fill="var(--err)"/>)}
-            <text x="4" y="12" fontSize="11" fill="var(--mid)">{chart.mx}</text>
-          </svg>
+          <div style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:8,marginBottom:12}}>
+            <div style={{display:"flex",gap:2,flexWrap:"wrap"}} role="group" aria-label="Chart view">
+              {[["test","this test","1"],["progress","progress","2"],["compare","compare","3"]].map(([k,l,n])=>
+                <Btn key={k} on={tab===k} aria-pressed={tab===k} onClick={()=>setTab(k)} title={`Press ${n}`}>{l}</Btn>)}
+            </div>
+            <Btn on={showTable} aria-pressed={showTable} onClick={()=>setShowTable(v=>!v)} title="Press T">table</Btn>
+          </div>
+          {tab==="test"&&<div>
+            <div style={{fontSize:12.5,color:"var(--mid)",marginBottom:4}}>speed per second (wpm) · red dots = seconds with mistakes</div>
+            <SecondChart series={result.series} errs={result.errs}/>
+            {showTable&&<DataTable cap="Speed and mistakes for each second of this test" head={["second","wpm","mistakes"]} rows={result.series.map((v,i)=>[i+1,v,result.errs[i]])}/>}
+          </div>}
+          {tab==="progress"&&<ProgressPanel history={history} cfg={result.rec} scope={scope} setScope={setScope} showTable={showTable}/>}
+          {tab==="compare"&&<ComparePanel history={history} result={result} showTable={showTable}/>}
         </div>
         <div className="card" style={{marginTop:18}}>
           <div style={{fontSize:12,color:"var(--mid)",marginBottom:10}}>{top.length?"keys you missed most — brighter = more misses":"no missed keys. clean run."}</div>
