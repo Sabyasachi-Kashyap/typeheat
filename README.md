@@ -1,10 +1,11 @@
 <div align="center">
 
-# typeheat
+<img src="docs/wordmark.svg" alt="typeheat" width="420">
+
 
 **A minimal typing test where your speed heats up the screen.**
 
-[**Live demo**](https://Sabyasachi-Kashyap.github.io/typeheat/) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Roadmap](#roadmap)
+[**Live demo**](https://YOUR-USERNAME.github.io/typeheat/) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Roadmap](#roadmap)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
@@ -59,7 +60,7 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 **Requirements:** Node.js 18 or newer.
 
 ```bash
-git clone https://github.com/Sabyasachi-Kashyap/typeheat.git
+git clone https://github.com/YOUR-USERNAME/typeheat.git
 cd typeheat
 npm install
 npm run dev
@@ -116,7 +117,7 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 
 1. Push the repo to GitHub.
 2. Go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Your site is live at `https://Sabyasachi-Kashyap.github.io/typeheat/` after about a minute.
+3. Your site is live at `https://YOUR-USERNAME.github.io/typeheat/` after about a minute.
 
 `vite.config.js` uses `base: "./"`, so the build works under any repository name without changes.
 
