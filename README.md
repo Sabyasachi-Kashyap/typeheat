@@ -5,7 +5,7 @@
 
 **A minimal typing test where your speed heats up the screen.**
 
-[**Live demo**](https://YOUR-USERNAME.github.io/typeheat/) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Roadmap](#roadmap)
+[**Live demo**](https://Sabyasachi-Kashyap.github.io/typeheat/) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Roadmap](#roadmap)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
@@ -31,8 +31,11 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 
 | | |
 |---|---|
-| **Modes** | Time (15 / 30 / 60 / 120 s) and words (10 / 25 / 50 / 100) |
+| **Modes** | Time (15 / 30 / 60 / 120 s), words (10 / 25 / 50 / 100), **practice** (words built from your weakest letter pairs), **code** (Python or JavaScript tokens) and **text** (paste your own text, or use a sample) |
 | **Text options** | Punctuation and numbers toggles on a 500-word English list |
+| **Adaptive practice** | Each test updates a per-browser profile of the letter pairs you miss or type slowly. Older tests fade, so the profile follows recent form |
+| **Finger analysis** | Accuracy per finger (left pinky to right pinky) for each test |
+| **Letter pairs** | The pairs you missed most or typed slowest in a test, with average gap in ms |
 | **Backspace** | *Fast erase* (Backspace deletes a word) or *classic* (Backspace deletes a letter, `Ctrl/Alt+Backspace` deletes a word) |
 | **Heat effect** | Glow, caret and live "% hot" readout driven by your last ~2 seconds of typing |
 | **Endless text** | In time mode, words keep scrolling in, so you never run out before the timer does |
@@ -40,7 +43,10 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 | **Missed-key heatmap** | A keyboard that lights up the keys you get wrong most |
 | **Personal bests** | Saved per mode and setting in your browser |
 | **Themes** | night, paper, violet |
-| **Accessibility** | Caret and button transitions turn off under `prefers-reduced-motion`; keyboard-only by design |
+| **Text size** | Small, medium or large |
+| **Readable font** | Switches to Atkinson Hyperlegible, designed to make letters easier to tell apart |
+| **Wrong letters** | Mistakes are underlined as well as coloured, so they stand out without relying on colour |
+| **Accessibility** | Caret and button transitions turn off under `prefers-reduced-motion`; a hidden input lets phones type |
 
 <div align="center">
 <img src="docs/results.png" alt="Results screen with WPM, accuracy, speed chart and missed-key heatmap" width="780">
@@ -54,13 +60,15 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 | `Backspace` | Delete a word (fast erase) or a letter (classic) |
 | `Ctrl` / `Alt` + `Backspace` | Delete a word in classic mode |
 | `Space` | Commit the current word and move on |
+| `1` / `2` / `3` | After a test: this test, progress, compare |
+| `T` | After a test: show or hide the data table |
 
 ## Getting started
 
 **Requirements:** Node.js 18 or newer.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/typeheat.git
+git clone https://github.com/Sabyasachi-Kashyap/typeheat.git
 cd typeheat
 npm install
 npm run dev
@@ -73,6 +81,7 @@ Open the URL Vite prints (usually http://localhost:5173) and start typing.
 | `npm run dev` | Start the dev server with hot reload |
 | `npm run build` | Create a production build in `dist/` |
 | `npm run preview` | Serve the production build locally |
+| `npm test` | Run the unit tests for scoring, analysis and practice selection |
 
 ## How it works
 
@@ -101,7 +110,12 @@ typeheat/
 ├── .github/workflows/deploy.yml   # build + publish to GitHub Pages on push to main
 ├── docs/                          # README screenshots
 ├── src/
-│   ├── App.jsx                    # the whole app: engine, UI, results
+│   ├── App.jsx                    # UI and the typing session
+│   ├── engine.js                  # pure logic: word generation, scoring, analysis, practice (no React)
+│   ├── engine.test.js             # unit tests for engine.js
+│   ├── analysis.jsx               # per-finger bars and letter-pair list
+│   ├── progress.jsx               # settings, history, charts and comparison panels
+│   ├── words.js / code.js / passages.js   # word list, code tokens and sample passages
 │   └── main.jsx                   # React entry point
 ├── index.html
 ├── vite.config.js
@@ -109,7 +123,7 @@ typeheat/
 └── LICENSE
 ```
 
-The app is a single component today. Splitting the typing engine from the UI is on the roadmap.
+The typing logic lives in `engine.js`, which has no React or browser dependencies, so it can be tested with `npm test`.
 
 ## Deployment
 
@@ -117,7 +131,7 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 
 1. Push the repo to GitHub.
 2. Go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Your site is live at `https://YOUR-USERNAME.github.io/typeheat/` after about a minute.
+3. Your site is live at `https://Sabyasachi-Kashyap.github.io/typeheat/` after about a minute.
 
 `vite.config.js` uses `base: "./"`, so the build works under any repository name without changes.
 
@@ -128,20 +142,24 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 - [x] Heat effect
 - [x] Results with chart and missed-key heatmap
 - [x] Themes and personal bests
-- [ ] Mobile and touch support (needs a hidden input field)
-- [ ] Remember theme and mode between visits
-- [ ] Practice mode that drills your weakest keys and letter pairs
-- [ ] Quote mode and code-typing mode
+- [x] Mobile and touch support (hidden input field; not yet tested on a real phone)
+- [x] Remember theme, mode and settings between visits
+- [x] Practice mode that drills your weakest letter pairs
+- [x] Custom text (paste your own) and sample passages
+- [x] Code-typing mode (Python and JavaScript tokens)
+- [x] Accessibility: text size, readable font, underlined mistakes
+- [x] Unit tests for the scoring and practice logic
 - [ ] Larger, frequency-ranked word lists
+- [ ] Bigram heatmap across the keyboard
 - [ ] Sound and caret style options
-- [ ] Unit tests for the scoring logic
 - [ ] Accounts, history and leaderboards (needs a backend)
 - [ ] Multiplayer races
 
 ## Known limitations
 
-- Desktop keyboards only for now.
-- Personal bests are stored in your browser's `localStorage`, so they are per device and cleared with site data.
+- Touch support is basic and has not been tested on real phones. Some keyboards may behave differently.
+- Code mode types space-separated tokens, so indentation and line breaks are not modelled yet.
+- Personal bests, letter-pair profile and settings are stored in your browser's `localStorage`, so they are per device and cleared with site data.
 - Fonts (Manrope and JetBrains Mono) load from Google Fonts. Offline, the app falls back to system fonts.
 
 ## Feedback
