@@ -4,25 +4,38 @@ import React, { useRef, useState } from "react";
 
 const KEY_CFG = "ttw:cfg";
 const KEY_HIST = "ttw:history";
+const KEY_PROFILE = "ttw:letter-pairs";
+const KEY_CUSTOM = "ttw:custom-text";
 const MAX_HIST = 300;
 
-export const AMOUNTS = { time: [15, 30, 60, 120], words: [10, 25, 50, 100] };
+export const AMOUNTS = { time: [15, 30, 60, 120], words: [10, 25, 50, 100], practice: [10, 25, 50, 100], code: [10, 25, 50, 100], text: [] };
+export const MODES = ["time", "words", "practice", "code", "text"];
+export const MODE_LABEL = { time: "time", words: "words", practice: "practice", code: "code", text: "text" };
 export const THEMES = ["night", "paper", "violet"];
-export const DEF = { mode: "time", amount: 30, punct: false, nums: false, bs: "word", theme: "night" };
+export const SIZES = { s: 22, m: 27, l: 34 };
+export const LANGS = { python: "python", js: "javascript" };
+export const DEF = {
+  mode: "time", amount: 30, punct: false, nums: false, bs: "word", theme: "night",
+  size: "m", font: "default", lang: "python",
+};
 
 export function loadCfg() {
   try {
     const s = JSON.parse(localStorage.getItem(KEY_CFG) || "null") || {};
-    const mode = s.mode === "words" ? "words" : "time";
+    const mode = MODES.includes(s.mode) ? s.mode : DEF.mode;
     // "fast"/"classic" were the first names for "word"/"letter"
     const bs = s.bs === "letter" || s.bs === "classic" ? "letter" : "word";
+    const list = AMOUNTS[mode];
     return {
       mode,
-      amount: AMOUNTS[mode].includes(s.amount) ? s.amount : AMOUNTS[mode][1],
+      amount: list.length ? (list.includes(s.amount) ? s.amount : list[1]) : 0,
       punct: !!s.punct,
       nums: !!s.nums,
       bs,
       theme: THEMES.includes(s.theme) ? s.theme : DEF.theme,
+      size: SIZES[s.size] ? s.size : DEF.size,
+      font: s.font === "readable" ? "readable" : "default",
+      lang: LANGS[s.lang] ? s.lang : DEF.lang,
     };
   } catch (e) {
     return { ...DEF };
@@ -45,11 +58,39 @@ export function saveHist(h) {
 export function clearHist() {
   try { localStorage.removeItem(KEY_HIST); } catch (e) { /* private mode */ }
 }
+export function loadProfile() {
+  try {
+    const p = JSON.parse(localStorage.getItem(KEY_PROFILE) || "null");
+    return p && typeof p.pairs === "object" ? p : null;
+  } catch (e) {
+    return null;
+  }
+}
+export function saveProfile(p) {
+  try { localStorage.setItem(KEY_PROFILE, JSON.stringify(p)); } catch (e) { /* private mode */ }
+}
+export function clearProfile() {
+  try { localStorage.removeItem(KEY_PROFILE); } catch (e) { /* private mode */ }
+}
+export function loadCustom() {
+  try { return localStorage.getItem(KEY_CUSTOM) || ""; } catch (e) { return ""; }
+}
+export function saveCustom(s) {
+  try { localStorage.setItem(KEY_CUSTOM, s); } catch (e) { /* private mode */ }
+}
 
+// Two records belong to the same setting when they would be compared on the same scale.
 export const sameSetting = (a, b) =>
-  a.mode === b.mode && a.amount === b.amount && !!a.punct === !!b.punct && !!a.nums === !!b.nums;
-export const settingLabel = (r) =>
-  (r.mode === "time" ? `time ${r.amount}s` : `words ${r.amount}`) + (r.punct ? ", punctuation" : "") + (r.nums ? ", numbers" : "");
+  a.mode === b.mode && a.amount === b.amount && !!a.punct === !!b.punct && !!a.nums === !!b.nums &&
+  (a.mode !== "code" || a.lang === b.lang);
+export const settingLabel = (r) => {
+  const base =
+    r.mode === "time" ? `time ${r.amount}s`
+    : r.mode === "text" ? `text ${r.amount} words`
+    : r.mode === "code" ? `code ${LANGS[r.lang] || ""} ${r.amount}`.trim()
+    : `${MODE_LABEL[r.mode] || r.mode} ${r.amount}`;
+  return base + (r.punct ? ", punctuation" : "") + (r.nums ? ", numbers" : "");
+};
 
 /* ───────────── small helpers ───────────── */
 
