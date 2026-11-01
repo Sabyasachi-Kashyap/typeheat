@@ -340,6 +340,13 @@ export default function TypingTest(){
           {result.pairs.length>0&&<button className="b" style={{padding:"10px 20px",fontSize:14}} onClick={()=>set({mode:"practice",amount:25})}>practice weak pairs</button>}
         </div>
       </div>}
+      <section aria-label="About typeheat" style={{marginTop:56,fontSize:14,lineHeight:1.65,color:"var(--mid)",maxWidth:640,opacity:running?0:1,transition:"opacity .25s"}}>
+        <h2 style={{fontSize:15,color:"var(--fg)",fontWeight:600,margin:"0 0 8px"}}>About typeheat</h2>
+        <p style={{margin:"0 0 10px"}}>typeheat is a free, minimal typing test. Your speed shows up as heat: the glow behind the text and the caret move from teal to amber as you type faster, then fade when you slow down.</p>
+        <p style={{margin:"0 0 10px"}}>Plain Backspace can erase a whole word, so one bad word doesn't cost you your rhythm. Each test shows your WPM, accuracy, consistency, a per-second speed chart, the keys you miss most, and accuracy for each finger.</p>
+        <p style={{margin:"0 0 10px"}}>Modes include timed and word tests, practice (built from the letter pairs you miss or type slowly), code (Python and JavaScript tokens), and text (paste your own). Settings include text size, a readable font and three themes.</p>
+        <p style={{margin:0}}>Personal bests and progress are saved in your browser. Nothing is sent to a server, and no account is needed.</p>
+      </section>
     </div>
   </div>;
 }
