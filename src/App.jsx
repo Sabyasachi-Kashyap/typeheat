@@ -215,7 +215,7 @@ export default function TypingTest(){
   const vars={"--grid":dark?"rgba(255,255,255,.09)":"rgba(0,0,0,.12)","--s1":pal[0],"--s2":pal[1],"--s3":pal[2],"--bg":th.bg,"--panel":th.panel,"--fg":th.fg,"--dim":th.dim,"--mid":th.mid,"--err":th.err,"--hc":`rgb(${th.cool})`};
   const readable=cfg.font==="readable";
   const hintBs=cfg.bs==="word"?"backspace deletes a word, shift+backspace deletes a single letter":"backspace deletes a single letter, ctrl+backspace a word";
-  return <div ref={rootRef} style={{...vars,background:"var(--bg)",color:"var(--fg)",minHeight:"100vh",position:"relative",overflow:"hidden",fontFamily:"'Manrope',system-ui,sans-serif",padding:"36px 20px",display:"flex",justifyContent:"center",WebkitFontSmoothing:"antialiased"}}>
+  return <div ref={rootRef} style={{...vars,background:"var(--bg)",color:"var(--fg)",minHeight:"100vh",position:"relative",overflow:"hidden",fontFamily:"'Manrope',system-ui,sans-serif",padding:"24px 20px",display:"flex",justifyContent:"center",WebkitFontSmoothing:"antialiased"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
       *{box-sizing:border-box}.mono{font-family:'JetBrains Mono',monospace}
       .b{background:transparent;border:1px solid transparent;color:var(--mid);padding:6px 11px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s}
@@ -229,7 +229,7 @@ export default function TypingTest(){
       @media (prefers-reduced-motion:reduce){.caret,.b{transition:none}}
       @media (max-width:560px){.bar{justify-content:center}.sep{display:none}}`}</style>
     <div ref={glowRef} style={{position:"fixed",inset:0,pointerEvents:"none"}}/>
-    <div style={{width:"100%",maxWidth:1180,position:"relative"}}>
+    <div style={{width:"100%",maxWidth:1600,position:"relative"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:10}}>
         <div style={{fontWeight:700,fontSize:20,letterSpacing:"-.02em"}}>type<span style={{color:"var(--hc)"}}>heat</span></div>
         <div className="bar" style={{opacity:running?0:1,pointerEvents:running?"none":"auto"}}>
@@ -279,7 +279,7 @@ export default function TypingTest(){
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
         <div ref={boxRef} onClick={()=>touchRef.current?.focus()} className={readable?undefined:"mono"}
-          style={{position:"relative",height:"5.1em",overflow:"hidden",WebkitMaskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",maskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
+          style={{position:"relative",height:"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",maskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
           <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
@@ -340,12 +340,15 @@ export default function TypingTest(){
           {result.pairs.length>0&&<button className="b" style={{padding:"10px 20px",fontSize:14}} onClick={()=>set({mode:"practice",amount:25})}>practice weak pairs</button>}
         </div>
       </div>}
-      <section aria-label="About typeheat" style={{marginTop:56,fontSize:14,lineHeight:1.65,color:"var(--mid)",maxWidth:640,opacity:running?0:1,transition:"opacity .25s"}}>
-        <h2 style={{fontSize:15,color:"var(--fg)",fontWeight:600,margin:"0 0 8px"}}>About typeheat</h2>
-        <p style={{margin:"0 0 10px"}}>typeheat is a free, minimal typing test. Your speed shows up as heat: the glow behind the text and the caret move from teal to amber as you type faster, then fade when you slow down.</p>
-        <p style={{margin:"0 0 10px"}}>Plain Backspace can erase a whole word, so one bad word doesn't cost you your rhythm. Each test shows your WPM, accuracy, consistency, a per-second speed chart, the keys you miss most, and accuracy for each finger.</p>
-        <p style={{margin:"0 0 10px"}}>Modes include timed and word tests, practice (built from the letter pairs you miss or type slowly), code (Python and JavaScript tokens), and text (paste your own). Settings include text size, a readable font and three themes.</p>
-        <p style={{margin:0}}>Personal bests and progress are saved in your browser. Nothing is sent to a server, and no account is needed.</p>
+      <section aria-label="About typeheat" style={{marginTop:36,opacity:running?0:1,transition:"opacity .25s"}}>
+        <h2 style={{fontSize:15,color:"var(--fg)",fontWeight:600,margin:"0 0 12px"}}>About typeheat</h2>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,fontSize:14,lineHeight:1.6,color:"var(--mid)"}}>
+          <div className="card"><b style={{color:"var(--fg)"}}>Heat</b><p style={{margin:"6px 0 0"}}>A free, minimal typing test. The glow and caret move from teal to amber as you type faster, then fade when you slow down.</p></div>
+          <div className="card"><b style={{color:"var(--fg)"}}>Backspace</b><p style={{margin:"6px 0 0"}}>Plain Backspace erases a whole word, so one bad word doesn't cost you your rhythm.</p></div>
+          <div className="card"><b style={{color:"var(--fg)"}}>Results</b><p style={{margin:"6px 0 0"}}>WPM, accuracy, consistency, a per-second chart, the keys you miss most, and accuracy for each finger.</p></div>
+          <div className="card"><b style={{color:"var(--fg)"}}>Modes</b><p style={{margin:"6px 0 0"}}>Timed and word tests, practice on your weakest letter pairs, code (Python and JavaScript), and text (paste your own).</p></div>
+          <div className="card"><b style={{color:"var(--fg)"}}>Privacy</b><p style={{margin:"6px 0 0"}}>Personal bests and progress are saved in your browser. Nothing is sent to a server, and no account is needed.</p></div>
+        </div>
       </section>
     </div>
   </div>;
