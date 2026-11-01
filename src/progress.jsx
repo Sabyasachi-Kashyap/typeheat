@@ -191,7 +191,9 @@ function LineChart({ data, yMin = 0, yMax, unit = "", h = 150, errs = false, all
   const Y = (v) => T + ph - ((v - yMin) / (top - yMin || 1)) * ph;
   const P = data.map((d, i) => [X(i), Y(d.y)]);
   const ticks = [...new Set([0, 1, 2, 3].map((k) => Math.round(yMin + ((top - yMin) * k) / 3)))];
-  const line = P.map((p) => p.join(",")).join(" ");
+  // Smooth curve through the points. Control points are clamped to the range of each segment,
+  // so the curve never overshoots (speeds never dip below 0 between seconds).
+  const curve = smoothPath(P);
   const last = P[n - 1];
 
   const move = (e) => {
@@ -212,8 +214,8 @@ function LineChart({ data, yMin = 0, yMax, unit = "", h = 150, errs = false, all
             <text x={L - 8} y={Y(t) + 4} textAnchor="end" fontSize="11" fill="var(--mid)" className="mono">{t}</text>
           </g>
         ))}
-        {n > 1 && <polygon points={`${P[0][0]},${T + ph} ${line} ${last[0]},${T + ph}`} fill={color} opacity=".1" />}
-        {n > 1 && <polyline points={line} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />}
+        {n > 1 && <path d={`${curve} L${last[0]},${T + ph} L${P[0][0]},${T + ph} Z`} fill={color} opacity=".1" />}
+        {n > 1 && <path d={curve} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />}
         {data.map((d, i) => {
           const bad = errs && d.e > 0 && i !== n - 1;
           if (!(all || i === n - 1 || bad)) return null;
@@ -241,6 +243,20 @@ function LineChart({ data, yMin = 0, yMax, unit = "", h = 150, errs = false, all
 }
 
 /* chart 1: speed during the test just finished */
+// SVG path through points [x, y] as a smooth cubic curve (Catmull-Rom converted to Bezier).
+function smoothPath(P) {
+  if (P.length < 2) return "";
+  let d = `M${P[0][0]},${P[0][1]}`;
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || P[i + 1];
+    const lo = Math.min(p1[1], p2[1]), hi = Math.max(p1[1], p2[1]);
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = Math.min(hi, Math.max(lo, p1[1] + (p2[1] - p0[1]) / 6));
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = Math.min(hi, Math.max(lo, p2[1] - (p3[1] - p1[1]) / 6));
+    d += ` C${c1x},${c1y} ${c2x},${c2y} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
+
 export function SecondChart({ series, errs }) {
   const data = series.map((v, i) => ({
     y: v,
