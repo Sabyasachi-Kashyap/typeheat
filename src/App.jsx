@@ -279,7 +279,7 @@ export default function TypingTest(){
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
         <div ref={boxRef} onClick={()=>touchRef.current?.focus()} className={readable?undefined:"mono"}
-          style={{position:"relative",height:"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",maskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
+          style={{position:"relative",height:"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",maskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
           <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
