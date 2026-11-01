@@ -215,7 +215,7 @@ export default function TypingTest(){
   const vars={"--grid":dark?"rgba(255,255,255,.09)":"rgba(0,0,0,.12)","--s1":pal[0],"--s2":pal[1],"--s3":pal[2],"--bg":th.bg,"--panel":th.panel,"--fg":th.fg,"--dim":th.dim,"--mid":th.mid,"--err":th.err,"--hc":`rgb(${th.cool})`};
   const readable=cfg.font==="readable";
   const hintBs=cfg.bs==="word"?"backspace deletes a word, shift+backspace deletes a single letter":"backspace deletes a single letter, ctrl+backspace a word";
-  return <div ref={rootRef} style={{...vars,background:"var(--bg)",color:"var(--fg)",minHeight:"100vh",position:"relative",overflow:"hidden",fontFamily:"'Manrope',system-ui,sans-serif",padding:"24px 20px",display:"flex",justifyContent:"center",WebkitFontSmoothing:"antialiased"}}>
+  return <div ref={rootRef} style={{...vars,background:"var(--bg)",color:"var(--fg)",minHeight:"100vh",position:"relative",overflow:"hidden",fontFamily:"'Manrope',system-ui,sans-serif",padding:"24px 4vw",display:"flex",justifyContent:"center",WebkitFontSmoothing:"antialiased"}}>
     <style>{`@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
       *{box-sizing:border-box}.mono{font-family:'JetBrains Mono',monospace}
       .b{background:transparent;border:1px solid transparent;color:var(--mid);padding:6px 11px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s}
