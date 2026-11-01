@@ -229,7 +229,7 @@ export default function TypingTest(){
       @media (prefers-reduced-motion:reduce){.caret,.b{transition:none}}
       @media (max-width:560px){.bar{justify-content:center}.sep{display:none}}`}</style>
     <div ref={glowRef} style={{position:"fixed",inset:0,pointerEvents:"none"}}/>
-    <div style={{width:"100%",maxWidth:820,position:"relative"}}>
+    <div style={{width:"100%",maxWidth:1180,position:"relative"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:10}}>
         <div style={{fontWeight:700,fontSize:20,letterSpacing:"-.02em"}}>type<span style={{color:"var(--hc)"}}>heat</span></div>
         <div className="bar" style={{opacity:running?0:1,pointerEvents:running?"none":"auto"}}>
@@ -279,7 +279,7 @@ export default function TypingTest(){
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
         <div ref={boxRef} onClick={()=>touchRef.current?.focus()} className={readable?undefined:"mono"}
-          style={{position:"relative",height:"5.1em",overflow:"hidden",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
+          style={{position:"relative",height:"5.1em",overflow:"hidden",WebkitMaskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",maskImage:"linear-gradient(transparent,#000 14%,#000 86%,transparent)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
           <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
