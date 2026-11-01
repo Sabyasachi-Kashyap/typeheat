@@ -2,7 +2,7 @@ import React,{useState,useRef,useEffect,useCallback} from "react";
 import {loadCfg,saveCfg,loadHist,saveHist,clearHist,loadProfile,saveProfile,clearProfile,loadCustom,saveCustom,
   THEMES,MODES,MODE_LABEL,AMOUNTS,LANGS,SIZES,SecondChart,ProgressPanel,ComparePanel,HistoryView,DataTable,sameSetting} from "./progress.jsx";
 import {FingerBars,PairList} from "./analysis.jsx";
-import {gen,codeWords,textWords,practiceWords,scoreTest,analyseLog,mergeProfile,weakPairs,MAX_TEXT_WORDS} from "./engine.js";
+import {textFor,codeWords,textWords,practiceWords,scoreTest,analyseLog,mergeProfile,weakPairs,MAX_TEXT_WORDS} from "./engine.js";
 import {PASSAGES} from "./passages.js";
 
 const TH={
@@ -21,7 +21,7 @@ function makeWords(c,custom){
   if(c.mode==="practice")return practiceWords(loadProfile(),c.amount);
   if(c.mode==="code")return codeWords(c.amount,c.lang);
   if(c.mode==="text")return textWords(custom);
-  return gen(c.mode==="words"?c.amount:120,c);
+  return textFor(c.mode==="words"?c.amount:120,c);
 }
 // Letter pairs worth a second look in this test: missed most first, then slowest.
 function rankPairs(pairs){
@@ -137,7 +137,7 @@ export default function TypingTest(){
       if(c.mode!=="time"&&idx===WR.current.length-1&&typed[idx].length>=w.length){S.current={typed,index:idx};setSession(S.current);finish();return;}
     }else return;
     S.current={typed,index:idx};setSession(S.current);
-    if(c.mode==="time"&&WR.current.length-idx<40){WR.current=[...WR.current,...gen(60,c)];setWords(WR.current);}
+    if(c.mode==="time"&&WR.current.length-idx<40){WR.current=[...WR.current,...textFor(60,c,false)];setWords(WR.current);}
   },[reset,finish,heat]);
 
   // Keyboard: ignore keys typed into a text box or the phone input (that input is handled by onTouchInput).
