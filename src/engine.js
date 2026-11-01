@@ -2,6 +2,7 @@
 // No React and no browser APIs, so it can be unit-tested with `npm test`.
 import { WB } from "./words.js";
 import { CODE_TOKENS } from "./code.js";
+import { SENTENCES } from "./sentences.js";
 
 export const MAX_TEXT_WORDS = 400;
 const MAX_GAP_MS = 2000; // gaps longer than this are pauses, not typing speed
@@ -11,9 +12,13 @@ export const rnd = (a) => a[Math.floor(Math.random() * a.length)];
 /* ───────────── text generation ───────────── */
 
 // Random English words, with optional numbers and punctuation (time and words modes).
-export function gen(n, o) {
+// Grammar rules: "i" is always "I"; with punctuation on, a sentence starts with a capital
+// after . ? or ! (and the first word is capitalised). `prev` is the last word already shown,
+// so a batch appended mid-sentence does not start with a false capital.
+export function gen(n, o, prev = "") {
   const out = [];
   let last = "";
+  let capNext = prev === "" || /[.?!]$/.test(prev);
   for (let i = 0; i < n; i++) {
     let w;
     if (o.nums && Math.random() < 0.12) w = String(Math.floor(Math.random() * (Math.random() < 0.5 ? 100 : 10000)));
@@ -21,16 +26,39 @@ export function gen(n, o) {
       do w = rnd(WB); while (w === last);
     }
     last = w;
+    if (w === "i") w = "I";
+    else if (o.punct && capNext && !/^\d/.test(w)) w = w[0].toUpperCase() + w.slice(1);
+    capNext = false;
     if (o.punct && !/^\d/.test(w)) {
-      if (Math.random() < 0.15) w = w[0].toUpperCase() + w.slice(1);
       const r = Math.random();
       if (r < 0.1) w += ",";
-      else if (r < 0.16) w += ".";
-      else if (r < 0.18) w += "?";
+      else if (r < 0.16) { w += "."; capNext = true; }
+      else if (r < 0.18) { w += "?"; capNext = true; }
     }
     out.push(w);
   }
   return out;
+}
+
+// Grammatical text: whole sentences, with capitals and punctuation, until n words are reached.
+// exact=false keeps the last sentence whole (used when appending to a running test).
+// Digits appear only when the numbers option is on.
+export function sentenceWords(n, o, exact = true) {
+  const pool = o.nums ? SENTENCES : SENTENCES.filter((x) => !/\d/.test(x));
+  const out = [];
+  let lastSent = "";
+  while (out.length < n) {
+    let x;
+    do x = rnd(pool); while (x === lastSent && pool.length > 1);
+    lastSent = x;
+    out.push(...x.split(" "));
+  }
+  return exact ? out.slice(0, n) : out;
+}
+
+// The word list for words and time tests: sentences when punctuation is on, plain lowercase words otherwise.
+export function textFor(n, o, exact = true) {
+  return o.punct ? sentenceWords(n, o, exact) : gen(n, { nums: o.nums, punct: false });
 }
 
 // Code tokens for one language, no immediate repeats.

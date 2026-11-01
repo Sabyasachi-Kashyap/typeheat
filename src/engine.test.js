@@ -1,10 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  scoreTest, analyseLog, fingerOf, mergeProfile, weakPairs, practiceWords, codeWords, textWords, gen, FINGERS,
+  scoreTest, analyseLog, fingerOf, mergeProfile, weakPairs, practiceWords, codeWords, textWords, gen, textFor, FINGERS,
 } from "./engine.js";
 import { WB } from "./words.js";
 import { CODE_TOKENS } from "./code.js";
+import { SENTENCES } from "./sentences.js";
 
 test("WPM: 24 correct characters in one minute is 5 WPM", () => {
   const words = ["aaaa", "aaaa", "aaaa", "aaaa", "aaaa"];
@@ -82,13 +83,34 @@ test("practice words all contain the weakest letter pair", () => {
 test("practice falls back to random words without a profile", () => {
   const words = practiceWords(null, 12);
   assert.equal(words.length, 12);
-  assert.ok(words.every((w) => WB.includes(w) || /^\d+$/.test(w)));
+  assert.ok(words.every((w) => WB.includes(w.toLowerCase()) || /^\d+$/.test(w)));
 });
 
 test("gen respects the numbers and punctuation options", () => {
   const plain = gen(200, { nums: false, punct: false });
-  assert.ok(plain.every((w) => /^[a-z]+$/.test(w)));
+  assert.ok(plain.every((w) => /^(I|[a-z]+)$/.test(w)));
   assert.equal(gen(30, { nums: true, punct: true }).length, 30);
+});
+
+test("gen follows basic grammar: I is capital, sentences start with a capital", () => {
+  const words = gen(2000, { nums: true, punct: true });
+  assert.ok(words.every((w) => w !== "i" && !/^i[.,?]$/.test(w)));
+  assert.ok(/^[A-Z]/.test(words[0]) || /^\d/.test(words[0]));
+  words.forEach((w, i) => {
+    const prev = words[i - 1];
+    if (i > 0 && /[.?!]$/.test(prev) && /^[a-z]/i.test(w)) {
+      assert.equal(w[0], w[0].toUpperCase(), `word after "${prev}" should be capitalised: ${w}`);
+    }
+    // no random capitals in the middle of a sentence
+    if (i > 0 && !/[.?!]$/.test(prev) && /^[A-Z][a-z]/.test(w)) {
+      assert.fail(`mid-sentence capital: ${w}`);
+    }
+  });
+  // a batch appended after an unfinished sentence does not start with a capital
+  const tail = gen(200, { punct: true }, "word");
+  tail.forEach((w, i) => {
+    if (i === 0 && !/^I$/.test(w)) assert.equal(w, w.toLowerCase());
+  });
 });
 
 test("code tokens come from the chosen language", () => {
@@ -102,4 +124,23 @@ test("custom text splits on whitespace and is capped", () => {
   assert.deepEqual(textWords("  one\ntwo   three  "), ["one", "two", "three"]);
   assert.equal(textWords("a ".repeat(1000)).length, 400);
   assert.deepEqual(textWords(""), []);
+});
+
+test("every sentence in the bank starts with a capital and ends with punctuation", () => {
+  SENTENCES.forEach((s) => {
+    assert.match(s, /^["A-Z]/, s);
+    assert.match(s, /[.?!"]$/, s);
+    assert.doesNotMatch(s, /[^\x20-\x7E]/, "ASCII only: " + s);
+  });
+});
+
+test("sentence text follows grammar and respects the numbers option", () => {
+  const words = textFor(300, { punct: true, nums: false });
+  assert.equal(words.length, 300);
+  assert.ok(words.every((w) => !/\d/.test(w)), "no digits when numbers are off");
+  assert.ok(words.every((w) => w !== "i" && !/^i[.,?!]?$/.test(w)), "I is always capital");
+  words.forEach((w, i) => {
+    if (i > 0 && /[.?!]$/.test(words[i - 1])) assert.match(w, /^["A-Z]/, `after "${words[i - 1]}": ${w}`);
+  });
+  assert.ok(textFor(400, { punct: true, nums: true }).some((w) => /\d/.test(w)), "digits appear when numbers are on");
 });
