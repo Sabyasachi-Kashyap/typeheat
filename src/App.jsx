@@ -279,7 +279,7 @@ export default function TypingTest(){
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
         <div ref={boxRef} onClick={()=>touchRef.current?.focus()} className={readable?undefined:"mono"}
-          style={{position:"relative",height:"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",maskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
+          style={{position:"relative",height:coarse?"min(30vh,260px)":"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",maskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
           <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
@@ -287,6 +287,7 @@ export default function TypingTest(){
         </div>
         {coarse&&<input ref={touchRef} aria-label="Typing input" autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false}
           defaultValue={SENT} onInput={onTouchInput} onKeyDown={onTouchKey}
+          onFocus={()=>setTimeout(()=>boxRef.current?.scrollIntoView({block:"center",behavior:"smooth"}),350)}
           style={{position:"fixed",left:0,bottom:0,width:1,height:1,opacity:0,border:0,padding:0,fontSize:16}}/>}
         <div style={{marginTop:30,fontSize:12.5,color:"var(--dim)",opacity:running?0:1,transition:"opacity .25s"}}>
           {coarse?"tap the text, then type · ":"start typing · "}<b>tab</b> restart · {hintBs}
