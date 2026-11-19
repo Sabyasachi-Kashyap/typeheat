@@ -283,12 +283,12 @@ export default function TypingTest(){
           <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
+            {coarse&&<input ref={touchRef} aria-label="Typing input" autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false}
+              defaultValue={SENT} onInput={onTouchInput} onKeyDown={onTouchKey}
+              onFocus={()=>setTimeout(()=>boxRef.current?.scrollIntoView({block:"start",behavior:"smooth"}),300)}
+              style={{position:"absolute",left:0,top:0,width:1,height:1,opacity:0,border:0,padding:0,fontSize:16}}/>}
           <div ref={caretRef} className="caret"/>
         </div>
-        {coarse&&<input ref={touchRef} aria-label="Typing input" autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false}
-          defaultValue={SENT} onInput={onTouchInput} onKeyDown={onTouchKey}
-          onFocus={()=>setTimeout(()=>boxRef.current?.scrollIntoView({block:"center",behavior:"smooth"}),350)}
-          style={{position:"fixed",left:0,bottom:0,width:1,height:1,opacity:0,border:0,padding:0,fontSize:16}}/>}
         <div style={{marginTop:30,fontSize:12.5,color:"var(--dim)",opacity:running?0:1,transition:"opacity .25s"}}>
           {coarse?"tap the text, then type · ":"start typing · "}<b>tab</b> restart · {hintBs}
         </div>
