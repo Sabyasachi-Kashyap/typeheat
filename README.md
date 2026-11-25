@@ -32,7 +32,7 @@ It stays quiet otherwise: no ads, no accounts, no popups. Settings fade out the 
 | | |
 |---|---|
 | **Modes** | Time (15 / 30 / 60 / 120 s), words (10 / 25 / 50 / 100), **practice** (words built from your weakest letter pairs), **code** (Python or JavaScript tokens) and **text** (paste your own text, or use a sample) |
-| **Text options** | Punctuation and numbers toggles on a 500-word English list |
+| **Text options** | Punctuation mode types grammatically correct sentences, with capitals, contractions, quotes and proper nouns. The numbers toggle adds digits. Code mode types programming tokens |
 | **Adaptive practice** | Each test updates a per-browser profile of the letter pairs you miss or type slowly. Older tests fade, so the profile follows recent form |
 | **Finger analysis** | Accuracy per finger (left pinky to right pinky) for each test |
 | **Letter pairs** | The pairs you missed most or typed slowest in a test, with average gap in ms |
@@ -116,6 +116,7 @@ typeheat/
 │   ├── analysis.jsx               # per-finger bars and letter-pair list
 │   ├── progress.jsx               # settings, history, charts and comparison panels
 │   ├── words.js / code.js / passages.js   # word list, code tokens and sample passages
+│   ├── sentences.js               # grammatically correct sentences for punctuation mode
 │   └── main.jsx                   # React entry point
 ├── index.html
 ├── vite.config.js
@@ -142,7 +143,7 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 - [x] Heat effect
 - [x] Results with chart and missed-key heatmap
 - [x] Themes and personal bests
-- [x] Mobile and touch support (hidden input field; not yet tested on a real phone)
+- [x] Mobile and touch support (tested on Android Chrome; iPhone not yet tested)
 - [x] Remember theme, mode and settings between visits
 - [x] Practice mode that drills your weakest letter pairs
 - [x] Custom text (paste your own) and sample passages
@@ -157,7 +158,7 @@ The included workflow builds the site and publishes it to GitHub Pages on every 
 
 ## Known limitations
 
-- Touch support is basic and has not been tested on real phones. Some keyboards may behave differently.
+- Touch typing is tested on Android Chrome only. iPhone and other browsers haven't been tested yet.
 - Code mode types space-separated tokens, so indentation and line breaks are not modelled yet.
 - Personal bests, letter-pair profile and settings are stored in your browser's `localStorage`, so they are per device and cleared with site data.
 - Fonts (Manrope and JetBrains Mono) load from Google Fonts. Offline, the app falls back to system fonts.
