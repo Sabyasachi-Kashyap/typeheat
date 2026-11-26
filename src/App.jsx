@@ -279,8 +279,8 @@ export default function TypingTest(){
           <span style={{color:"var(--hc)",fontWeight:600}}>{live}</span><span ref={hotRef}>0% hot</span>
         </div>
         <div ref={boxRef} onClick={()=>touchRef.current?.focus()} className={readable?undefined:"mono"}
-          style={{position:"relative",height:coarse?"min(30vh,260px)":"min(50vh,540px)",overflow:"hidden",WebkitMaskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",maskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
-          <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
+          style={{position:"relative",height:"5.1em",overflow:"hidden",WebkitMaskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",maskImage:"linear-gradient(#000 0%,#000 84%,transparent 100%)",fontSize:SIZES[cfg.size],lineHeight:1.7,letterSpacing:readable?".02em":".3px",fontFamily:readable?"'Atkinson Hyperlegible',system-ui,sans-serif":"'JetBrains Mono',monospace"}}>
+          <div ref={wrapRef} style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"0 .55em",transition:"transform .22s cubic-bezier(.22,.61,.36,1)",willChange:"transform"}}>
             {words.slice(0,index+70).map((w,i)=><Word key={i} wi={i} w={w} t={typed[i]||""} cur={i===index} refs={wref}/>)}
           </div>
             {coarse&&<input ref={touchRef} aria-label="Typing input" autoCapitalize="off" autoCorrect="off" autoComplete="off" spellCheck={false}
