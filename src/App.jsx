@@ -1,4 +1,4 @@
-import React,{useState,useRef,useEffect,useCallback} from "react";
+import React,{useState,useRef,useEffect,useLayoutEffect,useCallback} from "react";
 import {loadCfg,saveCfg,loadHist,saveHist,clearHist,loadProfile,saveProfile,clearProfile,loadCustom,saveCustom,
   THEMES,MODES,MODE_LABEL,AMOUNTS,LANGS,SIZES,SecondChart,ProgressPanel,ComparePanel,HistoryView,DataTable,sameSetting} from "./progress.jsx";
 import {FingerBars,PairList} from "./analysis.jsx";
@@ -186,7 +186,8 @@ export default function TypingTest(){
   },[cfg.theme]);
 
   // scroll: keep current line on row 2 of 3; caret from layout offsets (not mid-transition rects)
-  useEffect(()=>{
+  // useLayoutEffect: the caret moves in the same frame as the letter, not one frame later
+  useLayoutEffect(()=>{
     const el=wref.current[index],wrap=wrapRef.current,caret=caretRef.current;
     if(!el||!wrap||!caret)return;
     const lh=el.offsetHeight||44,ty=Math.max(0,el.offsetTop-lh);
@@ -226,7 +227,7 @@ export default function TypingTest(){
       .b:hover{color:var(--fg)}.b.on{color:var(--hc);border-color:var(--hc)}.b:disabled{opacity:.4;cursor:default}
       .bar{display:flex;flex-wrap:wrap;gap:2px;align-items:center;background:var(--panel);border-radius:10px;padding:4px 6px;transition:opacity .25s}
       .sep{width:1px;height:16px;background:var(--dim);opacity:.4;margin:0 6px}
-      .caret{position:absolute;left:0;top:0;width:2px;border-radius:2px;background:var(--hc);transition:transform .08s cubic-bezier(.2,.8,.2,1);pointer-events:none;will-change:transform}
+      .caret{position:absolute;left:0;top:0;width:2px;border-radius:2px;background:var(--hc);transition:transform .05s linear;pointer-events:none;will-change:transform}
       .card{background:var(--panel);border-radius:12px;padding:14px 18px}
       .lbl{color:var(--dim);font-size:12.5px;padding:0 8px 0 6px}
       .tip{position:absolute;pointer-events:none;z-index:5;background:var(--bg);border:1px solid var(--dim);border-radius:8px;padding:7px 10px;white-space:nowrap;font-size:12.5px;line-height:1.5}
