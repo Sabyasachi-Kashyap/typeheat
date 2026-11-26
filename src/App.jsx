@@ -169,17 +169,21 @@ export default function TypingTest(){
 
   // heat animation: refs + direct DOM writes, never React state
   useEffect(()=>{
-    let raf;const tick=()=>{
+    let raf,last=-1;const tick=()=>{
       if(performance.now()-lastKey.current>600)hT.current*=0.97;
       hD.current+=(hT.current-hD.current)*0.08;
-      const h=hD.current,t=TH[cfgRef.current.theme],c=`rgb(${mix(t.cool,t.hot,h)})`;
-      rootRef.current?.style.setProperty("--hc",c);
-      if(glowRef.current)glowRef.current.style.background=`radial-gradient(${55+h*25}% 60% at 50% 40%, rgba(${mix(t.cool,t.hot,h)},${0.1+h*0.38}) 0%, transparent 70%)`;
-      if(caretRef.current)caretRef.current.style.boxShadow=`0 0 ${6+h*16}px ${c}`;
-      if(hotRef.current)hotRef.current.textContent=Math.round(h*100)+"% hot";
+      const h=hD.current;
+      // repaint only when the heat has visibly changed, so idle frames cost almost nothing
+      if(Math.abs(h-last)>0.002){
+        last=h;const t=TH[cfgRef.current.theme],c=`rgb(${mix(t.cool,t.hot,h)})`;
+        rootRef.current?.style.setProperty("--hc",c);
+        if(glowRef.current)glowRef.current.style.background=`radial-gradient(${55+h*25}% 60% at 50% 40%, rgba(${mix(t.cool,t.hot,h)},${0.1+h*0.38}) 0%, transparent 70%)`;
+        if(caretRef.current)caretRef.current.style.boxShadow=`0 0 ${6+h*16}px ${c}`;
+        if(hotRef.current)hotRef.current.textContent=Math.round(h*100)+"% hot";
+      }
       raf=requestAnimationFrame(tick);
     };raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf);
-  },[]);
+  },[cfg.theme]);
 
   // scroll: keep current line on row 2 of 3; caret from layout offsets (not mid-transition rects)
   useEffect(()=>{
